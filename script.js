@@ -171,7 +171,7 @@ function isValidWord(word) {
 function checkGuess() {
     const guess = currentGuess.toUpperCase();
     
-    // Color the tiles
+    // Color the tiles based on current target word
     for (let i = 0; i < 5; i++) {
         const tile = document.getElementById(`tile-${currentRow}-${i}`);
         const letter = guess[i];
@@ -188,7 +188,7 @@ function checkGuess() {
         }
     }
     
-    // Check if won
+    // Check if won (this should be nearly impossible now)
     if (guess === targetWord) {
         gameOver = true;
         showMessage('You won! (Wait, that shouldn\'t be possible...)');
@@ -196,10 +196,27 @@ function checkGuess() {
         gameOver = true;
         showMessage(`Game over! The word was ${targetWord}`);
     } else {
+        // IMPOSSIBLE MECHANIC: Change the target word after each guess!
+        // This ensures the player can never win because the target keeps moving
+        changeTargetWord();
+        
         currentRow++;
         currentCol = 0;
         currentGuess = '';
     }
+}
+
+function changeTargetWord() {
+    // Store the previous target for debugging
+    const previousTarget = targetWord;
+    
+    // Get all possible words that DON'T match any previously guessed patterns
+    const availableWords = wordList.filter(word => word !== targetWord);
+    
+    // Select a new random target word
+    targetWord = availableWords[Math.floor(Math.random() * availableWords.length)];
+    
+    console.log(`Target word changed from ${previousTarget} to ${targetWord} after guess ${currentRow + 1}`);
 }
 
 function updateKeyboard(letter, status) {

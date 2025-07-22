@@ -171,3 +171,60 @@ header small {
     border: 2px inset #c0c0c0;
     font-family: 'MS Sans Serif', sans-serif;
 }
+
+/* Wrong answer animations */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes flashRed {
+    0%, 100% { background-color: #c0c0c0; }
+    50% { background-color: #ff0000; }
+}
+
+@keyframes tiltShake {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-2deg) scale(1.02); }
+    50% { transform: rotate(2deg) scale(0.98); }
+    75% { transform: rotate(-1deg) scale(1.01); }
+}
+
+@keyframes errorPulse {
+    0% { 
+        background-color: #ffffff;
+        border-color: #c0c0c0;
+        transform: scale(1);
+    }
+    50% { 
+        background-color: #ffcccc;
+        border-color: #ff0000;
+        transform: scale(1.05);
+    }
+    100% { 
+        background-color: #ffffff;
+        border-color: #c0c0c0;
+        transform: scale(1);
+    }
+}
+
+.shake-animation {
+    animation: shake 0.5s ease-in-out;
+}
+
+.flash-red {
+    animation: flashRed 0.3s ease-in-out 3;
+}
+
+.tilt-shake {
+    animation: tiltShake 0.6s ease-in-out;
+}
+
+.error-pulse {
+    animation: errorPulse 0.4s ease-in-out 2;
+}
+
+.row.shake-row {
+    animation: shake 0.5s ease-in-out;
+}

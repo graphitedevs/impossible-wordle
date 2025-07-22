@@ -171,21 +171,18 @@ function isValidWord(word) {
 function checkGuess() {
     const guess = currentGuess.toUpperCase();
     
-    // Color the tiles based on current target word
+    // IMPOSSIBLE MECHANIC: Misleading feedback system
+    // Give feedback that's intentionally misleading and inconsistent
+    const misleadingFeedback = generateMisleadingFeedback(guess, targetWord);
+    
+    // Color the tiles with misleading feedback instead of correct feedback
     for (let i = 0; i < 5; i++) {
         const tile = document.getElementById(`tile-${currentRow}-${i}`);
         const letter = guess[i];
+        const feedbackType = misleadingFeedback[i];
         
-        if (letter === targetWord[i]) {
-            tile.classList.add('correct');
-            updateKeyboard(letter, 'correct');
-        } else if (targetWord.includes(letter)) {
-            tile.classList.add('present');
-            updateKeyboard(letter, 'present');
-        } else {
-            tile.classList.add('absent');
-            updateKeyboard(letter, 'absent');
-        }
+        tile.classList.add(feedbackType);
+        updateKeyboard(letter, feedbackType);
     }
     
     // Check if won (this should be nearly impossible now)
@@ -204,6 +201,46 @@ function checkGuess() {
         currentCol = 0;
         currentGuess = '';
     }
+}
+
+function generateMisleadingFeedback(guess, target) {
+    const feedback = [];
+    const feedbackTypes = ['correct', 'present', 'absent'];
+    
+    for (let i = 0; i < 5; i++) {
+        const letter = guess[i];
+        
+        // 30% chance to give completely random feedback
+        if (Math.random() < 0.3) {
+            feedback.push(feedbackTypes[Math.floor(Math.random() * feedbackTypes.length)]);
+        }
+        // 40% chance to give wrong but plausible feedback
+        else if (Math.random() < 0.7) {
+            if (letter === target[i]) {
+                // Letter is correct but show as present or absent
+                feedback.push(Math.random() < 0.5 ? 'present' : 'absent');
+            } else if (target.includes(letter)) {
+                // Letter is present but show as correct or absent
+                feedback.push(Math.random() < 0.5 ? 'correct' : 'absent');
+            } else {
+                // Letter is absent but show as correct or present
+                feedback.push(Math.random() < 0.5 ? 'correct' : 'present');
+            }
+        }
+        // 30% chance to give correct feedback (to make it seem somewhat legitimate)
+        else {
+            if (letter === target[i]) {
+                feedback.push('correct');
+            } else if (target.includes(letter)) {
+                feedback.push('present');
+            } else {
+                feedback.push('absent');
+            }
+        }
+    }
+    
+    console.log(`Misleading feedback for guess "${guess}" against target "${target}":`, feedback);
+    return feedback;
 }
 
 function changeTargetWord() {
@@ -234,10 +271,30 @@ function showMessage(text) {
     }, 3000);
 }
 
+function addSubtleTrickery() {
+    // Occasionally flash misleading hints
+    setInterval(() => {
+        if (!gameOver && Math.random() < 0.1) { // 10% chance every interval
+            const deceptiveHints = [
+                "Try words with more vowels!",
+                "The answer contains a double letter!",
+                "Think of common 5-letter words!",
+                "The word starts with a consonant!",
+                "Almost there! Keep going!",
+                "You're getting warmer!",
+                "That was close! Try again!"
+            ];
+            const hint = deceptiveHints[Math.floor(Math.random() * deceptiveHints.length)];
+            showMessage(hint);
+        }
+    }, 5000); // Check every 5 seconds
+}
+
 // Initialize the game board and keyboard when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     createGameBoard();
     createKeyboard();
     addKeyboardEventListeners();
-    console.log(`Game loaded! Target word: ${targetWord}`);
+    addSubtleTrickery();
+    console.log(`Game loaded! Target word: ${targetWord} (but it will change...)`);
 });

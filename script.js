@@ -141,9 +141,11 @@ function handleKeyPress(key) {
                 checkGuess();
             } else {
                 showMessage('Not a valid word!');
+                triggerInvalidWordAnimation();
             }
         } else {
             showMessage('Not enough letters!');
+            triggerNotEnoughLettersAnimation();
         }
     } else if (key === 'BACKSPACE') {
         if (currentCol > 0) {
@@ -162,6 +164,33 @@ function handleKeyPress(key) {
             currentCol++;
         }
     }
+}
+
+function triggerInvalidWordAnimation() {
+    const currentRowElement = document.querySelectorAll('.row')[currentRow];
+    const messageBox = document.getElementById('message');
+    
+    currentRowElement.classList.add('shake-row');
+    messageBox.classList.add('error-pulse');
+    
+    setTimeout(() => {
+        currentRowElement.classList.remove('shake-row');
+        messageBox.classList.remove('error-pulse');
+    }, 500);
+}
+
+function triggerNotEnoughLettersAnimation() {
+    const currentRowElement = document.querySelectorAll('.row')[currentRow];
+    const container = document.querySelector('.container');
+    
+    // Shake the current row and tilt the container
+    currentRowElement.classList.add('shake-row');
+    container.classList.add('tilt-shake');
+    
+    setTimeout(() => {
+        currentRowElement.classList.remove('shake-row');
+        container.classList.remove('tilt-shake');
+    }, 600);
 }
 
 function isValidWord(word) {
@@ -189,10 +218,15 @@ function checkGuess() {
     if (guess === targetWord) {
         gameOver = true;
         showMessage('You won! (Wait, that shouldn\'t be possible...)');
+        triggerVictoryAnimation();
     } else if (currentRow === 5) {
         gameOver = true;
         showMessage(`Game over! The word was ${targetWord}`);
+        triggerGameOverAnimation();
     } else {
+        // Trigger wrong answer animations
+        triggerWrongAnswerAnimation();
+        
         // IMPOSSIBLE MECHANIC: Change the target word after each guess!
         // This ensures the player can never win because the target keeps moving
         changeTargetWord();
@@ -288,6 +322,81 @@ function addSubtleTrickery() {
             showMessage(hint);
         }
     }, 5000); // Check every 5 seconds
+}
+
+function triggerWrongAnswerAnimation() {
+    const animations = ['shake', 'tilt', 'flash', 'pulse'];
+    const selectedAnimation = animations[Math.floor(Math.random() * animations.length)];
+    
+    const currentRowElement = document.querySelectorAll('.row')[currentRow];
+    const container = document.querySelector('.container');
+    const messageBox = document.getElementById('message');
+    
+    switch(selectedAnimation) {
+        case 'shake':
+            currentRowElement.classList.add('shake-row');
+            container.classList.add('shake-animation');
+            setTimeout(() => {
+                currentRowElement.classList.remove('shake-row');
+                container.classList.remove('shake-animation');
+            }, 500);
+            break;
+            
+        case 'tilt':
+            container.classList.add('tilt-shake');
+            setTimeout(() => {
+                container.classList.remove('tilt-shake');
+            }, 600);
+            break;
+            
+        case 'flash':
+            container.classList.add('flash-red');
+            setTimeout(() => {
+                container.classList.remove('flash-red');
+            }, 900);
+            break;
+            
+        case 'pulse':
+            messageBox.classList.add('error-pulse');
+            setTimeout(() => {
+                messageBox.classList.remove('error-pulse');
+            }, 800);
+            break;
+    }
+    
+    // Add Windows 98 style error sound simulation
+    console.log('🔊 *Windows 98 error sound*');
+}
+
+function triggerVictoryAnimation() {
+    const container = document.querySelector('.container');
+    container.style.animation = 'tiltShake 0.3s ease-in-out 5';
+    setTimeout(() => {
+        container.style.animation = '';
+    }, 1500);
+}
+
+function triggerGameOverAnimation() {
+    const container = document.querySelector('.container');
+    const tiles = document.querySelectorAll('.tile');
+    
+    // Flash all tiles red
+    tiles.forEach((tile, index) => {
+        setTimeout(() => {
+            tile.classList.add('flash-red');
+            setTimeout(() => {
+                tile.classList.remove('flash-red');
+            }, 300);
+        }, index * 50);
+    });
+    
+    // Shake the whole container
+    setTimeout(() => {
+        container.classList.add('shake-animation');
+        setTimeout(() => {
+            container.classList.remove('shake-animation');
+        }, 500);
+    }, 1000);
 }
 
 // Initialize the game board and keyboard when the page loads
